@@ -144,8 +144,9 @@ public final class TestUtils implements CMLConstants {
 						Assert.fail(message + " attribute on ref not on test: "
 								+ attName);
 					}
-					testStringDoubleEquality(message, refAtt.getValue(),
-							testAtt.getValue(), eps);
+					testStringDoubleEquality(message + " attribute "
+							+ path(testAtt) + " values differ:", refAtt
+							.getValue(), testAtt.getValue(), eps);
 				}
 			} else {
 				Assert.fail(message + "cannot deal with XMLNode: "
