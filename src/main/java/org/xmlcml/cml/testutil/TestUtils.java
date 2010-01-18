@@ -4,12 +4,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.ComparisonFailure;
 import nu.xom.Attribute;
 import nu.xom.Comment;
 import nu.xom.Element;
+import nu.xom.Elements;
 import nu.xom.Node;
 import nu.xom.ProcessingInstruction;
 import nu.xom.Text;
@@ -82,8 +87,7 @@ public final class TestUtils implements CMLConstants {
 		}
 		try {
 			assertEqualsIncludingFloat(message, refNode, testNode, eps);
-		} catch (RuntimeException e) {
-			e.printStackTrace();
+		} catch (AssertionError e) {
 			logger.warn(e);
 			reportXMLDiffInFull(message, e.getMessage(), refNode, testNode);
 		}
@@ -113,8 +117,8 @@ public final class TestUtils implements CMLConstants {
 			} else if (refNode instanceof Element) {
 				int refNodeChildCount = refNode.getChildCount();
 				int testNodeChildCount = testNode.getChildCount();
-				Assert.assertEquals("number of children", testNodeChildCount,
-						refNodeChildCount);
+				Assert.assertEquals("number of children of " + path(testNode),
+						refNodeChildCount, testNodeChildCount);
 				for (int i = 0; i < refNodeChildCount; i++) {
 					assertEqualsIncludingFloat(message, refNode.getChild(i),
 							testNode.getChild(i), eps);
@@ -151,6 +155,54 @@ public final class TestUtils implements CMLConstants {
 			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	private static String path(Node testNode) {
+		List<String> fullpath = path(testNode, new ArrayList<String>());
+		Collections.reverse(fullpath);
+		StringBuilder sb = new StringBuilder();
+		for (String p : fullpath) {
+			sb.append(p);
+		}
+		return sb.toString();
+	}
+
+	private static List<String> path(Node testNode, List<String> path) {
+		if (testNode instanceof Element) {
+			Element e = (Element) testNode;
+			StringBuilder frag = new StringBuilder("/");
+			if (!"".equals(e.getNamespacePrefix())) {
+				frag.append(e.getNamespacePrefix()).append(":");
+			}
+			path.add(frag.append(e.getLocalName()).append("[").append(
+					siblingOrdinal(e)).append("]").toString());
+
+		} else if (testNode instanceof Attribute) {
+			Attribute a = (Attribute) testNode;
+			path.add(new StringBuilder("@").append(a.getNamespacePrefix())
+					.append(":").append(a.getLocalName()).toString());
+		} else if (testNode instanceof Text) {
+			path.add("/text()");
+		}
+		return (testNode.getParent() != null) ? path(testNode.getParent(), path)
+				: path;
+	}
+
+	private static int siblingOrdinal(Element e) {
+		Element parent = (Element) e.getParent();
+		if (parent == null) {
+			return 0;
+		} else {
+			Elements els = parent.getChildElements(e.getLocalName(), e
+					.getNamespaceURI());
+			for (int i = 0; i < els.size(); i++) {
+				if (els.get(i).equals(e)) {
+					return i;
+				}
+			}
+			throw new RuntimeException(
+					"Element was not a child of its parent. Most perplexing!");
 		}
 	}
 
