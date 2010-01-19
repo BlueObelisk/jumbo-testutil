@@ -105,7 +105,8 @@ public final class TestUtils implements CMLConstants {
 			Assert.assertEquals(message + ": classes", testNode.getClass(),
 					refNode.getClass());
 			if (refNode instanceof Text) {
-				testStringDoubleEquality(message, refNode.getValue(), testNode
+				testStringDoubleEquality(message + " on node: "
+						+ path(testNode), refNode.getValue(), testNode
 						.getValue(), eps);
 			} else if (refNode instanceof Comment) {
 				Assert.assertEquals(message + " comment", refNode.getValue(),
@@ -144,6 +145,7 @@ public final class TestUtils implements CMLConstants {
 						Assert.fail(message + " attribute on ref not on test: "
 								+ attName);
 					}
+
 					testStringDoubleEquality(message + " attribute "
 							+ path(testAtt) + " values differ:", refAtt
 							.getValue(), testAtt.getValue(), eps);
