@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,8 +21,6 @@ import nu.xom.tests.XOMTestCase;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.xmlcml.cml.base.CMLBuilder;
 import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.cml.base.CMLElement;
@@ -123,7 +120,8 @@ public final class TestUtils implements CMLConstants {
 			} else if (refNode instanceof Element) {
 				int refNodeChildCount = refNode.getChildCount();
 				int testNodeChildCount = testNode.getChildCount();
-				Assert.assertEquals("number of children of " + path(testNode),
+				String path = path(testNode);
+				Assert.assertEquals("number of children of " + path,
 						refNodeChildCount, testNodeChildCount);
 				for (int i = 0; i < refNodeChildCount; i++) {
 					assertEqualsIncludingFloat(message, refNode.getChild(i),
