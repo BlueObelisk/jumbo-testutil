@@ -28,7 +28,10 @@ import org.xmlcml.cml.base.CMLBuilder;
 import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.cml.base.CMLElement;
 import org.xmlcml.cml.base.CMLUtil;
+import org.xmlcml.euclid.EC;
 import org.xmlcml.euclid.EuclidRuntimeException;
+import org.xmlcml.euclid.Real;
+import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Util;
 
 /**
@@ -45,6 +48,8 @@ public final class TestUtils implements CMLConstants {
 
 	/** logger */
 	public final static Logger logger = Logger.getLogger(TestUtils.class);
+
+	public static final String OUTPUT_DIR_NAME = "target/test-outputs";
 
 	/**
 	 * tests 2 XML objects for equality using canonical XML. uses
@@ -427,5 +432,185 @@ public final class TestUtils implements CMLConstants {
 	public static void neverThrow(Exception e) {
 		throw new EuclidRuntimeException("should never throw " + e);
 	}
+	
+// ====================== CML and Euclid ===================
 
+	/**
+	 * Asserts equality of double arrays.
+	 * 
+	 * checks for non-null, then equality of length, then individual elements
+	 * 
+	 * @param message
+	 * @param a expected array
+	 * @param b actual array
+	 * @param eps tolerance for agreement
+	 */
+	public static void assertEquals(String message, double[] a, double[] b,
+			double eps) {
+		String s = testEquals(a, b, eps);
+		if (s != null) {
+			Assert.fail(message + "; " + s);
+		}
+	}
+
+	public static void assertObjectivelyEquals(String message, double[] a,
+			double[] b, double eps) {
+		String s = null;
+		if (a == null) {
+			s = "a is null";
+		} else if (b == null) {
+			s = "b is null";
+		} else if (a.length != b.length) {
+			s = "unequal arrays: " + a.length + EC.S_SLASH + b.length;
+		} else {
+			for (int i = 0; i < a.length; i++) {
+				if (!(((Double) a[i]).equals(b[i]) || !Real.isEqual(a[i], b[i],
+						eps))) {
+					s = "unequal element at (" + i + "), " + a[i] + " != "
+							+ b[i];
+					break;
+				}
+			}
+		}
+		if (s != null) {
+			Assert.fail(message + "; " + s);
+		}
+	}
+
+	/**
+	 * Asserts non equality of double arrays.
+	 * 
+	 * checks for non-null, then equality of length, then individual elements
+	 * 
+	 * @param message
+	 * @param a
+	 *            expected array
+	 * @param b
+	 *            actual array
+	 * @param eps
+	 *            tolerance for agreement
+	 */
+	public static void assertNotEquals(String message, double[] a, double[] b,
+			double eps) {
+		String s = testEquals(a, b, eps);
+		if (s == null) {
+			Assert.fail(message + "; arrays are equal");
+		}
+	}
+
+	public static String testEquals(String message, double[] a, double[] b, double eps) {
+		String msg = testEquals(a, b, eps);
+		return (msg == null) ? null : message+"; "+msg;
+	}
+	
+	/**
+	 * returns a message if arrays differ.
+	 * 
+	 * @param a
+	 *            array to compare
+	 * @param b
+	 *            array to compare
+	 * @param eps
+	 *            tolerance
+	 * @return null if arrays are equal else indicative message
+	 */
+	static String testEquals(double[] a, double[] b, double eps) {
+		String s = null;
+		if (a == null) {
+			s = "a is null";
+		} else if (b == null) {
+			s = "b is null";
+		} else if (a.length != b.length) {
+			s = "unequal arrays: " + a.length + EC.S_SLASH + b.length;
+		} else {
+			for (int i = 0; i < a.length; i++) {
+				if (!Real.isEqual(a[i], b[i], eps)) {
+					s = "unequal element at (" + i + "), " + a[i] + " != "
+							+ b[i];
+					break;
+				}
+			}
+		}
+		return s;
+	}
+
+	/**
+	 * returns a message if arrays of arrays differ.
+	 * 
+	 * @param a
+	 *            array to compare
+	 * @param b
+	 *            array to compare
+	 * @param eps
+	 *            tolerance
+	 * @return null if array are equal else indicative message
+	 */
+	static String testEquals(double[][] a, double[][] b, double eps) {
+		String s = null;
+		if (a == null) {
+			s = "a is null";
+		} else if (b == null) {
+			s = "b is null";
+		} else if (a.length != b.length) {
+			s = "unequal arrays: " + a.length + EC.S_SLASH + b.length;
+		} else {
+			for (int i = 0; i < a.length; i++) {
+				if (a[i].length != b[i].length) {
+					s = "row (" + i + ") has unequal lengths: " + a[i].length
+							+ EC.S_SLASH + b[i].length;
+					break;
+				}
+				for (int j = 0; j < a[i].length; j++) {
+					if (!Real.isEqual(a[i][j], b[i][j], eps)) {
+						s = "unequal element at (" + i + ", " + j + "), ("
+								+ a[i][j] + " != " + b[i][j] + EC.S_RBRAK;
+						break;
+					}
+				}
+			}
+		}
+		return s;
+	}
+// double arrays and related
+	
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, Transform2 expected, Transform2 test,
+			double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + EC.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + EC.S_RBRAK,
+				expected);
+		TestUtils.assertEquals(msg, expected
+				.getMatrixAsArray(), test.getMatrixAsArray(),  epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 *            16 values
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, double[] test,
+			Transform2 expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + EC.S_RBRAK, test);
+		Assert.assertEquals("test should have 16 elements (" + msg + EC.S_RBRAK,
+				9, test.length);
+		Assert.assertNotNull("ref should not be null (" + msg + EC.S_RBRAK,
+				expected);
+		TestUtils.assertEquals(msg, test, expected.getMatrixAsArray(),
+				epsilon);
+	}
+
+	
 }
