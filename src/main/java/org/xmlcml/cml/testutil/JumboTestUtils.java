@@ -1,6 +1,7 @@
 package org.xmlcml.cml.testutil;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
@@ -28,6 +29,7 @@ import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.EC;
 import org.xmlcml.euclid.EuclidRuntimeException;
 import org.xmlcml.euclid.Real;
+import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Util;
 
@@ -41,10 +43,10 @@ import org.xmlcml.euclid.Util;
  * @version 5.0
  * 
  */
-public final class TestUtils implements CMLConstants {
+public final class JumboTestUtils implements CMLConstants {
 
 	/** logger */
-	public final static Logger logger = Logger.getLogger(TestUtils.class);
+	public final static Logger logger = Logger.getLogger(JumboTestUtils.class);
 
 	public static final String OUTPUT_DIR_NAME = "target/test-outputs";
 
@@ -97,7 +99,7 @@ public final class TestUtils implements CMLConstants {
 
 	public static void assertEqualsIncludingFloat(String message,
 			String expectedS, Node testNode, boolean stripWhite, double eps) {
-		assertEqualsIncludingFloat(message, TestUtils
+		assertEqualsIncludingFloat(message, JumboTestUtils
 				.parseValidString(expectedS), testNode, stripWhite, eps);
 	}
 
@@ -121,8 +123,13 @@ public final class TestUtils implements CMLConstants {
 				int refNodeChildCount = refNode.getChildCount();
 				int testNodeChildCount = testNode.getChildCount();
 				String path = path(testNode);
-				Assert.assertEquals("number of children of " + path,
-						refNodeChildCount, testNodeChildCount);
+				// FIXME? fails to resolve in tests
+//				Assert.assertEquals("number of children of " + path,
+//						refNodeChildCount, testNodeChildCount);
+				if (refNodeChildCount != testNodeChildCount) {
+					Assert.fail("number of children of " + path + " "+
+						refNodeChildCount + " != " + testNodeChildCount);
+				}
 				for (int i = 0; i < refNodeChildCount; i++) {
 					assertEqualsIncludingFloat(message, refNode.getChild(i),
 							testNode.getChild(i), eps);
@@ -481,12 +488,9 @@ public final class TestUtils implements CMLConstants {
 	 * checks for non-null, then equality of length, then individual elements
 	 * 
 	 * @param message
-	 * @param a
-	 *            expected array
-	 * @param b
-	 *            actual array
-	 * @param eps
-	 *            tolerance for agreement
+	 * @param a expected array
+	 * @param b actual array
+	 * @param eps tolerance for agreement
 	 */
 	public static void assertNotEquals(String message, double[] a, double[] b,
 			double eps) {
@@ -504,12 +508,9 @@ public final class TestUtils implements CMLConstants {
 	/**
 	 * returns a message if arrays differ.
 	 * 
-	 * @param a
-	 *            array to compare
-	 * @param b
-	 *            array to compare
-	 * @param eps
-	 *            tolerance
+	 * @param a array to compare
+	 * @param b array to compare
+	 * @param eps tolerance
 	 * @return null if arrays are equal else indicative message
 	 */
 	static String testEquals(double[] a, double[] b, double eps) {
@@ -535,12 +536,9 @@ public final class TestUtils implements CMLConstants {
 	/**
 	 * returns a message if arrays of arrays differ.
 	 * 
-	 * @param a
-	 *            array to compare
-	 * @param b
-	 *            array to compare
-	 * @param eps
-	 *            tolerance
+	 * @param a array to compare
+	 * @param b array to compare
+	 * @param eps tolerance
 	 * @return null if array are equal else indicative message
 	 */
 	static String testEquals(double[][] a, double[][] b, double eps) {
@@ -569,13 +567,35 @@ public final class TestUtils implements CMLConstants {
 		}
 		return s;
 	}
+	// Real2
+	/**
+	 * returns a message if arrays differ.
+	 * 
+	 * @param a array to compare
+	 * @param b array to compare
+	 * @param eps tolerance
+	 * @return null if arrays are equal else indicative message
+	 */
+	public static String testEquals(Real2 a, Real2 b, double eps) {
+		String s = null;
+		if (a == null) {
+			s = "a is null";
+		} else if (b == null) {
+			s = "b is null";
+		} else {
+			if (!Real.isEqual(a.x, b.x, eps) ||
+				!Real.isEqual(a.y, b.y, eps)) {
+				s = ""+a+" != "+b;
+			}
+		}
+		return s;
+	}
 // double arrays and related
 	
 	/**
 	 * equality test. true if both args not null and equal within epsilon
 	 * 
-	 * @param msg
-	 *            message
+	 * @param msg message
 	 * @param test
 	 * @param expected
 	 * @param epsilon
@@ -585,17 +605,15 @@ public final class TestUtils implements CMLConstants {
 		Assert.assertNotNull("test should not be null (" + msg + EC.S_RBRAK, test);
 		Assert.assertNotNull("expected should not be null (" + msg + EC.S_RBRAK,
 				expected);
-		TestUtils.assertEquals(msg, expected
+		JumboTestUtils.assertEquals(msg, expected
 				.getMatrixAsArray(), test.getMatrixAsArray(),  epsilon);
 	}
 
 	/**
 	 * equality test. true if both args not null and equal within epsilon
 	 * 
-	 * @param msg
-	 *            message
-	 * @param test
-	 *            16 values
+	 * @param msg message
+	 * @param test 16 values
 	 * @param expected
 	 * @param epsilon
 	 */
@@ -606,7 +624,7 @@ public final class TestUtils implements CMLConstants {
 				9, test.length);
 		Assert.assertNotNull("ref should not be null (" + msg + EC.S_RBRAK,
 				expected);
-		TestUtils.assertEquals(msg, test, expected.getMatrixAsArray(),
+		JumboTestUtils.assertEquals(msg, test, expected.getMatrixAsArray(),
 				epsilon);
 	}
 
