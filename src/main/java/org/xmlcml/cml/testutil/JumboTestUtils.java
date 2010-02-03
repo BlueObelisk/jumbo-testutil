@@ -30,10 +30,26 @@ import org.xmlcml.cml.base.CMLElement;
 import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.EC;
 import org.xmlcml.euclid.EuclidRuntimeException;
+import org.xmlcml.euclid.IntArray;
+import org.xmlcml.euclid.IntMatrix;
+import org.xmlcml.euclid.IntSet;
+import org.xmlcml.euclid.Line3;
+import org.xmlcml.euclid.Plane3;
+import org.xmlcml.euclid.Point3;
+import org.xmlcml.euclid.Point3Vector;
 import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Vector;
+import org.xmlcml.euclid.Real3Range;
+import org.xmlcml.euclid.RealArray;
+import org.xmlcml.euclid.RealMatrix;
+import org.xmlcml.euclid.RealRange;
+import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Transform2;
+import org.xmlcml.euclid.Transform3;
 import org.xmlcml.euclid.Util;
+import org.xmlcml.euclid.Vector2;
+import org.xmlcml.euclid.Vector3;
 
 /**
  * 
@@ -244,10 +260,765 @@ public final class JumboTestUtils implements CMLConstants {
 		}
 	}
 
+	private static Element stripWhite(Element refNode) {
+		refNode = new Element(refNode);
+		CMLUtil.removeWhitespaceNodes(refNode);
+		return refNode;
+	}
+
+	public static void alwaysFail(String message) {
+		Assert.fail("should always throw " + message);
+	}
+
+// ====================== CML and Euclid ===================
+
+	public static String testEquals(String message, double[] a, double[] b, double eps) {
+		String msg = testEquals(a, b, eps);
+		return (msg == null) ? null : message+"; "+msg;
+	}
+	
+	// Real2
 	/**
-	 * tests 2 XML objects for equality using canonical XML. uses
-	 * XOMTestCase.assertEquals. This treats different prefixes as different and
-	 * compares floats literally.
+	 * returns a message if arrays differ.
+	 * 
+	 * @param a array to compare
+	 * @param b array to compare
+	 * @param eps tolerance
+	 * @return null if arrays are equal else indicative message
+	 */
+	public static String testEquals(Real2 a, Real2 b, double eps) {
+		String s = null;
+		if (a == null) {
+			s = "a is null";
+		} else if (b == null) {
+			s = "b is null";
+		} else {
+			if (!Real.isEqual(a.x, b.x, eps) ||
+				!Real.isEqual(a.y, b.y, eps)) {
+				s = ""+a+" != "+b;
+			}
+		}
+		return s;
+	}
+// double arrays and related
+	
+	/**
+	 * Asserts equality of double arrays.
+	 * 
+	 * checks for non-null, then equality of length, then individual elements
+	 * 
+	 * @param message
+	 * @param a
+	 *            expected array
+	 * @param b
+	 *            actual array
+	 * @param eps
+	 *            tolerance for agreement
+	 */
+	public static void assertEquals(String message, double[] a, double[] b,
+			double eps) {
+		String s = testEquals(a, b, eps);
+		if (s != null) {
+			Assert.fail(message + "; " + s);
+		}
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 *            array must be of length 4
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, double[] test, Plane3 expected,
+			double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertEquals("must be of length 4", 4, test.length);
+		Assert.assertNotNull("ref should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test, expected.getArray(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 *            array must be of length 3
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, double[] test, Point3 expected,
+			double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertEquals("must be of length 3", 3, test.length);
+		Assert.assertNotNull("ref should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test, expected.getArray(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 *            array must be of length 3
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, double[] test,
+			Point3Vector expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		Assert.assertEquals("must be of equal length ", test.length, expected
+				.getArray().length);
+		JumboTestUtils.assertEquals(msg, test, expected.getArray(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 *            array must be of length 2
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, double[] test, Real2 expected,
+			double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertEquals("must be of length 2", 2, test.length);
+		Assert.assertNotNull("ref should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test, expected.getXY(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 *            array must be of length 3
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, double[] test,
+			Real2Vector expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		Assert.assertEquals("must be of equal length ", test.length, expected
+				.getXY().getArray().length);
+		JumboTestUtils.assertEquals(msg, test, expected.getXY().getArray(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 *            array must be of length 3
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, double[] test,
+			RealArray expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		Assert.assertEquals("must be of equal length ", test.length, expected
+				.getArray().length);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 *            16 values
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, double[] test,
+			Transform2 expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertEquals("test should have 16 elements (" + msg + CMLConstants.S_RBRAK,
+				9, test.length);
+		Assert.assertNotNull("ref should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test, expected.getMatrixAsArray(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 *            16 values
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, double[] test,
+			Transform3 expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertEquals("test should have 16 elements (" + msg + CMLConstants.S_RBRAK,
+				16, test.length);
+		Assert.assertNotNull("ref should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test, expected.getMatrixAsArray(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 *            array must be of length 3
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, double[] test,
+			Vector3 expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertEquals("must be of length 3", 3, test.length);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test, expected.getArray(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param rows
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, int rows, double[] test,
+			RealSquareMatrix expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("ref should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		Assert.assertEquals("rows should be equal (" + msg + CMLConstants.S_RBRAK, rows,
+				expected.getRows());
+		JumboTestUtils.assertEquals(msg, test, expected.getMatrixAsArray(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param rows
+	 * @param cols
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, int rows, int cols,
+			double[] test, RealMatrix expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("ref should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		Assert.assertEquals("rows should be equal (" + msg + CMLConstants.S_RBRAK, rows,
+				expected.getRows());
+		Assert.assertEquals("columns should be equal (" + msg + CMLConstants.S_RBRAK, cols,
+				expected.getCols());
+		JumboTestUtils.assertEquals(msg, test, expected.getMatrixAsArray(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param rows
+	 * @param cols
+	 * @param test
+	 * @param expected
+	 */
+	public static void assertEquals(String msg, int rows, int cols, int[] test,
+			IntMatrix expected) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("ref should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		Assert.assertEquals("rows should be equal (" + msg + CMLConstants.S_RBRAK, rows,
+				expected.getRows());
+		Assert.assertEquals("columns should be equal (" + msg + CMLConstants.S_RBRAK, cols,
+				expected.getCols());
+		Assert.assertEquals(msg, test, expected.getMatrixAsArray());
+	}
+
+	/**
+	 * Asserts equality of int arrays.
+	 * 
+	 * checks for non-null, then equality of length, then individual elements
+	 * 
+	 * @param message
+	 * @param a
+	 *            expected array
+	 * @param b
+	 *            actual array
+	 */
+	public static void assertEquals(String message, int[] a, int[] b) {
+		String s = testEquals(a, b);
+		if (s != null) {
+			Assert.fail(message + "; " + s);
+		}
+	}
+
+	/**
+	 * equality test. true if both args not null and equal
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 */
+	public static void assertEquals(String msg, int[] test, IntArray expected) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		Assert.assertEquals("must be of equal length ", test.length, expected
+				.getArray().length);
+		Assert.assertEquals(msg, test, expected.getArray());
+	}
+
+	/**
+	 * equality test. true if both args not null and equal
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 */
+	public static void assertEquals(String msg, int[] test, IntSet expected) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		Assert.assertEquals("must be of equal length ", test.length, expected
+				.getElements().length);
+		Assert.assertEquals(msg, test, expected.getElements());
+	}
+
+	/**
+	 * equality test. true if both args not null and equal
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 */
+	public static void assertEquals(String msg, IntArray test, IntArray expected) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		Assert.assertEquals(msg, test.getArray(), expected.getArray());
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon and
+	 * rows are present and equals and columns are present and equals
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 */
+	public static void assertEquals(String msg, IntMatrix test,
+			IntMatrix expected) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		Assert.assertNotNull("expected should have columns (" + msg + CMLConstants.S_RBRAK,
+				expected.getCols());
+		Assert.assertNotNull("expected should have rows (" + msg + CMLConstants.S_RBRAK,
+				expected.getRows());
+		Assert.assertNotNull("test should have columns (" + msg + CMLConstants.S_RBRAK, test
+				.getCols());
+		Assert.assertNotNull("test should have rows (" + msg + CMLConstants.S_RBRAK, test
+				.getRows());
+		Assert.assertEquals("rows should be equal (" + msg + CMLConstants.S_RBRAK, test
+				.getRows(), expected.getRows());
+		Assert.assertEquals("columns should be equal (" + msg + CMLConstants.S_RBRAK, test
+				.getCols(), expected.getCols());
+		Assert.assertEquals(msg, test.getMatrixAsArray(), expected.getMatrixAsArray());
+	}
+
+	/**
+	 * equality test. true if both args not null and equal
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 */
+	public static void assertEquals(String msg, IntSet test, IntSet expected) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		Assert.assertEquals(msg, test.getElements(), expected.getElements());
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, Line3 test, Line3 expected,
+			double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("ref should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test.getPoint(), expected.getPoint(), epsilon);
+		JumboTestUtils.assertEquals(msg, test.getVector(), expected.getVector(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, Plane3 test, Plane3 expected,
+			double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("ref should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test.getArray(), expected.getArray(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, Point3 test, Point3 expected,
+			double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("ref should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test.getArray(), expected.getArray(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param testPoint
+	 * @param testVector
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, Point3 testPoint,
+			Vector3 testVector, Line3 expected, double epsilon) {
+		Assert.assertNotNull("testPoint should not be null (" + msg + CMLConstants.S_RBRAK,
+				testPoint);
+		Assert.assertNotNull("testVector should not be null (" + msg + CMLConstants.S_RBRAK,
+				testVector);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, testPoint, expected.getPoint(), epsilon);
+		JumboTestUtils.assertEquals(msg, testVector, expected.getVector(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, Point3Vector test,
+			Point3Vector expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test.getArray(), expected.getArray(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, Real2 test, Real2 expected,
+			double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test.getXY(), expected.getXY(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, Real2Vector expected,
+			Real2Vector test, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, expected.getXY().getArray(), test.getXY().getArray(),
+				epsilon);
+	}
+
+	/**
+	 * test ranges for equality.
+	 * 
+	 * @param msg
+	 * @param r3ref
+	 * @param r3
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, Real3Range r3ref,
+			Real3Range r3, double epsilon) {
+		JumboTestUtils.assertEquals("xRange", r3.getXRange(), r3ref.getXRange(), epsilon);
+		JumboTestUtils.assertEquals("yRange", r3.getYRange(), r3ref.getYRange(), epsilon);
+		JumboTestUtils.assertEquals("zRange", r3.getZRange(), r3ref.getZRange(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, RealArray test,
+			RealArray expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test.getArray(), expected.getArray(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon and
+	 * rows are present and equals and columns are present and equals
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, RealMatrix test,
+			RealMatrix expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		Assert.assertNotNull("expected should have columns (" + msg + CMLConstants.S_RBRAK,
+				expected.getCols());
+		Assert.assertNotNull("expected should have rows (" + msg + CMLConstants.S_RBRAK,
+				expected.getRows());
+		Assert.assertNotNull("test should have columns (" + msg + CMLConstants.S_RBRAK, test
+				.getCols());
+		Assert.assertNotNull("test should have rows (" + msg + CMLConstants.S_RBRAK, test
+				.getRows());
+		Assert.assertEquals("rows should be equal (" + msg + CMLConstants.S_RBRAK, test
+				.getRows(), expected.getRows());
+		Assert.assertEquals("columns should be equal (" + msg + CMLConstants.S_RBRAK, test
+				.getCols(), expected.getCols());
+		JumboTestUtils.assertEquals(msg, test.getMatrixAsArray(), expected.getMatrixAsArray(),
+				epsilon);
+	}
+
+	/**
+	 * tests equality of ranges.
+	 * 
+	 * @param msg
+	 *            message
+	 * @param ref
+	 * @param r
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, RealRange ref, RealRange r,
+			double epsilon) {
+		Assert.assertEquals(msg + " min", r.getMin(), ref.getMin(), epsilon);
+		Assert.assertEquals(msg + " max", r.getMax(), ref.getMax(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon and
+	 * rows are present and equals and columns are present and equals
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, RealSquareMatrix test,
+			RealSquareMatrix expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		Assert.assertNotNull("expected should have columns (" + msg + CMLConstants.S_RBRAK,
+				expected.getCols());
+		Assert.assertNotNull("expected should have rows (" + msg + CMLConstants.S_RBRAK,
+				expected.getRows());
+		Assert.assertNotNull("test should have columns (" + msg + CMLConstants.S_RBRAK, test
+				.getCols());
+		Assert.assertNotNull("test should have rows (" + msg + CMLConstants.S_RBRAK, test
+				.getRows());
+		Assert.assertEquals("rows should be equal (" + msg + CMLConstants.S_RBRAK, test
+				.getRows(), expected.getRows());
+		Assert.assertEquals("columns should be equal (" + msg + CMLConstants.S_RBRAK, test
+				.getCols(), expected.getCols());
+		JumboTestUtils.assertEquals(msg, test.getMatrixAsArray(), expected.getMatrixAsArray(),
+				epsilon);
+	}
+
+	/**
+	 * Asserts equality of String arrays.
+	 * 
+	 * convenience method where test is a whitespace-separated set of tokens
+	 * 
+	 * @param message
+	 * @param a
+	 *            expected array as space concatenated
+	 * @param b
+	 *            actual array may not include nulls
+	 */
+	public static void assertEquals(String message, String a, String[] b) {
+		String[] aa = a.split(EC.S_SPACE);
+		String s = testEquals(aa, b);
+		if (s != null) {
+			Assert.fail(message + "; " + s);
+		}
+	}
+
+	/**
+	 * Asserts equality of String arrays.
+	 * 
+	 * checks for non-null, then equality of length, then individual elements
+	 * equality if individual elements are equal or both elements are null
+	 * 
+	 * @param message
+	 * @param a
+	 *            expected array may include nulls
+	 * @param b
+	 *            actual array may include nulls
+	 */
+	public static void assertEquals(String message, String[] a, String[] b) {
+		String s = testEquals(a, b);
+		if (s != null) {
+			Assert.fail(message + "; " + s);
+		}
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, Transform2 test,
+			Transform2 expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test.getMatrixAsArray(), expected.getMatrixAsArray(),
+				epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, Transform3 test,
+			Transform3 expected, double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test.getMatrixAsArray(), expected.getMatrixAsArray(),
+				epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, Vector2 test, Vector2 expected,
+			double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test.getXY(), expected.getXY(), epsilon);
+	}
+
+	/**
+	 * equality test. true if both args not null and equal within epsilon
+	 * 
+	 * @param msg
+	 *            message
+	 * @param test
+	 * @param expected
+	 * @param epsilon
+	 */
+	public static void assertEquals(String msg, Vector3 test, Vector3 expected,
+			double epsilon) {
+		Assert.assertNotNull("test should not be null (" + msg + CMLConstants.S_RBRAK, test);
+		Assert.assertNotNull("expected should not be null (" + msg + CMLConstants.S_RBRAK,
+				expected);
+		JumboTestUtils.assertEquals(msg, test.getArray(), expected.getArray(), epsilon);
+	}
+
+	/**
+	 * tests 2 XML objects for equality using canonical XML.
 	 * 
 	 * @param message
 	 * @param refNode
@@ -297,36 +1068,91 @@ public final class JumboTestUtils implements CMLConstants {
 		}
 	}
 
-	private static Element stripWhite(Element refNode) {
-		refNode = new Element(refNode);
-		CMLUtil.removeWhitespaceNodes(refNode);
-		return refNode;
-	}
-
-	public static void reportXMLDiff(String message, String errorMessage,
-			Node refNode, Node testNode) {
-		Assert.fail(message + " ~ " + errorMessage);
-	}
-
-	public static void reportXMLDiffInFull(String message, String errorMessage,
-			Node refNode, Node testNode) {
-		try {
-			System.err.println("==========XMLDIFF reference=========");
-			CMLUtil.debug((Element) refNode, System.err, 2);
-			System.err.println("------------test---------------------");
-			CMLUtil.debug((Element) testNode, System.err, 2);
-			System.err.println("==============" + message
-					+ "===================");
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+	/**
+	 * compares two XML nodes and checks float near-equivalence (can also be
+	 * used for documents without floats) uses JumboTestUtils.assertEqualsCanonically and only
+	 * uses PMR code if fails
+	 * 
+	 * @param message
+	 * @param refNode
+	 * @param testNode
+	 * @param eps
+	 */
+	public static void assertEqualsIncludingFloat(String message, Node refNode,
+			Node testNode, boolean stripWhite, double eps, boolean report) {
+		if (stripWhite && refNode instanceof Element
+				&& testNode instanceof Element) {
+			refNode = stripWhite((Element) refNode);
+			testNode = stripWhite((Element) testNode);
 		}
-		Assert.fail(message + " ~ " + errorMessage);
+		try {
+			assertEqualsIncludingFloat(message, refNode, testNode, eps);
+		} catch (RuntimeException e) {
+			if (report) {
+				reportXMLDiffInFull(message, e.getMessage(), refNode, testNode);
+			}
+		}
 	}
 
 	/**
-	 * tests 2 XML objects for non-equality using canonical XML. uses
-	 * XOMTestCase.assertEquals. This treats different prefixes as different and
-	 * compares floats literally.
+	 * Asserts non equality of double arrays.
+	 * 
+	 * checks for non-null, then equality of length, then individual elements
+	 * 
+	 * @param message
+	 * @param a
+	 *            expected array
+	 * @param b
+	 *            actual array
+	 * @param eps
+	 *            tolerance for agreement
+	 */
+	public static void assertNotEquals(String message, double[] a, double[] b,
+			double eps) {
+		String s = testEquals(a, b, eps);
+		if (s == null) {
+			Assert.fail(message + "; arrays are equal");
+		}
+	}
+
+	/**
+	 * Asserts non equality of double arrays.
+	 * 
+	 * checks for non-null, then equality of length, then individual elements
+	 * 
+	 * @param message
+	 * @param a
+	 *            expected array
+	 * @param b
+	 *            actual array
+	 */
+	public static void assertNotEquals(String message, int[] a, int[] b) {
+		String s = testEquals(a, b);
+		if (s == null) {
+			Assert.fail(message + "; arrays are equal");
+		}
+	}
+
+	/**
+	 * Asserts non equality of String arrays.
+	 * 
+	 * checks for non-null, then equality of length, then individual elements
+	 * 
+	 * @param message
+	 * @param a
+	 *            expected array
+	 * @param b
+	 *            actual array
+	 */
+	public static void assertNotEquals(String message, String[] a, String[] b) {
+		String s = testEquals(a, b);
+		if (s == null) {
+			Assert.fail(message + "; arrays are equal");
+		}
+	}
+
+	/**
+	 * tests 2 XML objects for non-equality using canonical XML.
 	 * 
 	 * @param message
 	 * @param node1
@@ -337,13 +1163,37 @@ public final class JumboTestUtils implements CMLConstants {
 	public static void assertNotEqualsCanonically(String message, Node node1,
 			Node node2) {
 		try {
-			XOMTestCase.assertEquals(message, node1, node2);
+			Assert.assertEquals(message, node1, node2);
 			String s1 = CMLUtil.getCanonicalString(node1);
 			String s2 = CMLUtil.getCanonicalString(node2);
 			Assert.fail(message + "nodes should be different " + s1 + " != "
 					+ s2);
 		} catch (ComparisonFailure e) {
 		} catch (AssertionFailedError e) {
+		}
+	}
+
+	public static void assertObjectivelyEquals(String message, double[] a,
+			double[] b, double eps) {
+		String s = null;
+		if (a == null) {
+			s = "a is null";
+		} else if (b == null) {
+			s = "b is null";
+		} else if (a.length != b.length) {
+			s = "unequal arrays: " + a.length + CMLConstants.S_SLASH + b.length;
+		} else {
+			for (int i = 0; i < a.length; i++) {
+				if (!(((Double) a[i]).equals(b[i]) || !Real.isEqual(a[i], b[i],
+						eps))) {
+					s = "unequal element at (" + i + "), " + a[i] + " != "
+							+ b[i];
+					break;
+				}
+			}
+		}
+		if (s != null) {
+			Assert.fail(message + "; " + s);
 		}
 	}
 
@@ -365,48 +1215,6 @@ public final class JumboTestUtils implements CMLConstants {
 		}
 		String s = sw.toString();
 		Assert.assertEquals("HTML output ", expected, s);
-	}
-
-	/**
-	 * convenience method to parse test string.
-	 * 
-	 * @param s
-	 *            xml string (assumed valid)
-	 * @return root element
-	 */
-	public static Element parseValidString(String s) {
-		Element element = null;
-		if (s == null) {
-			throw new RuntimeException("NULL VALID JAVA_STRING");
-		}
-		try {
-			element = new CMLBuilder().parseString(s);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("ERROR " + e + e.getMessage() + "..."
-					+ s.substring(0, Math.min(100, s.length())));
-			Util.BUG(e);
-		}
-		return element;
-	}
-
-	/**
-	 * convenience method to parse test file. uses resource
-	 * 
-	 * @param filename
-	 *            relative to classpath
-	 * @return root element
-	 */
-	public static Element parseValidFile(String filename) {
-		Element root = null;
-		try {
-			URL url = Util.getResource(filename);
-			CMLBuilder builder = new CMLBuilder();
-			root = builder.build(new File(url.toURI())).getRootElement();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return root;
 	}
 
 	/**
@@ -432,87 +1240,82 @@ public final class JumboTestUtils implements CMLConstants {
 		Assert.fail("should never throw " + e);
 	}
 
-	public static void alwaysFail(String message) {
-		Assert.fail("should always throw " + message);
-	}
-
 	public static void neverThrow(Exception e) {
 		throw new EuclidRuntimeException("should never throw " + e);
 	}
-	
-// ====================== CML and Euclid ===================
 
 	/**
-	 * Asserts equality of double arrays.
+	 * convenience method to parse test file. uses resource
 	 * 
-	 * checks for non-null, then equality of length, then individual elements
-	 * 
-	 * @param message
-	 * @param a expected array
-	 * @param b actual array
-	 * @param eps tolerance for agreement
+	 * @param filename
+	 *            relative to classpath
+	 * @return root element
 	 */
-	public static void assertEquals(String message, double[] a, double[] b,
-			double eps) {
-		String s = testEquals(a, b, eps);
-		if (s != null) {
-			Assert.fail(message + "; " + s);
+	public static Element parseValidFile(String filename) {
+		Element root = null;
+		try {
+			URL url = Util.getResource(filename);
+			root = new CMLBuilder().build(new File(url.toURI()))
+					.getRootElement();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-	}
-
-	public static void assertObjectivelyEquals(String message, double[] a,
-			double[] b, double eps) {
-		String s = null;
-		if (a == null) {
-			s = "a is null";
-		} else if (b == null) {
-			s = "b is null";
-		} else if (a.length != b.length) {
-			s = "unequal arrays: " + a.length + EC.S_SLASH + b.length;
-		} else {
-			for (int i = 0; i < a.length; i++) {
-				if (!(((Double) a[i]).equals(b[i]) || !Real.isEqual(a[i], b[i],
-						eps))) {
-					s = "unequal element at (" + i + "), " + a[i] + " != "
-							+ b[i];
-					break;
-				}
-			}
-		}
-		if (s != null) {
-			Assert.fail(message + "; " + s);
-		}
+		return root;
 	}
 
 	/**
-	 * Asserts non equality of double arrays.
+	 * convenience method to parse test string.
 	 * 
-	 * checks for non-null, then equality of length, then individual elements
-	 * 
-	 * @param message
-	 * @param a expected array
-	 * @param b actual array
-	 * @param eps tolerance for agreement
+	 * @param s
+	 *            xml string (assumed valid)
+	 * @return root element
 	 */
-	public static void assertNotEquals(String message, double[] a, double[] b,
-			double eps) {
-		String s = testEquals(a, b, eps);
+	public static Element parseValidString(String s) {
+		Element element = null;
 		if (s == null) {
-			Assert.fail(message + "; arrays are equal");
+			throw new RuntimeException("NULL VALID JAVA_STRING");
 		}
+		try {
+			element = new CMLBuilder().parseString(s);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("ERROR " + e + e.getMessage() + "..."
+					+ s.substring(0, Math.min(100, s.length())));
+			Util.BUG(e);
+		}
+		return element;
 	}
 
-	public static String testEquals(String message, double[] a, double[] b, double eps) {
-		String msg = testEquals(a, b, eps);
-		return (msg == null) ? null : message+"; "+msg;
+	static protected void reportXMLDiff(String message, String errorMessage,
+			Node refNode, Node testNode) {
+		Assert.fail(message + " ~ " + errorMessage);
 	}
-	
+
+	static protected void reportXMLDiffInFull(String message,
+			String errorMessage, Node refNode, Node testNode) {
+		try {
+			System.err.println("Error: "+errorMessage);
+			System.err.println("==========XMLDIFF reference=========");
+			CMLUtil.debug((Element) refNode, System.err, 2);
+			System.err.println("------------test---------------------");
+			CMLUtil.debug((Element) testNode, System.err, 2);
+			System.err.println("==============" + message
+					+ "===================");
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		Assert.fail(message + " ~ " + errorMessage);
+	}
+
 	/**
 	 * returns a message if arrays differ.
 	 * 
-	 * @param a array to compare
-	 * @param b array to compare
-	 * @param eps tolerance
+	 * @param a
+	 *            array to compare
+	 * @param b
+	 *            array to compare
+	 * @param eps
+	 *            tolerance
 	 * @return null if arrays are equal else indicative message
 	 */
 	static String testEquals(double[] a, double[] b, double eps) {
@@ -522,7 +1325,7 @@ public final class JumboTestUtils implements CMLConstants {
 		} else if (b == null) {
 			s = "b is null";
 		} else if (a.length != b.length) {
-			s = "unequal arrays: " + a.length + EC.S_SLASH + b.length;
+			s = "unequal arrays: " + a.length + CMLConstants.S_SLASH + b.length;
 		} else {
 			for (int i = 0; i < a.length; i++) {
 				if (!Real.isEqual(a[i], b[i], eps)) {
@@ -538,9 +1341,12 @@ public final class JumboTestUtils implements CMLConstants {
 	/**
 	 * returns a message if arrays of arrays differ.
 	 * 
-	 * @param a array to compare
-	 * @param b array to compare
-	 * @param eps tolerance
+	 * @param a
+	 *            array to compare
+	 * @param b
+	 *            array to compare
+	 * @param eps
+	 *            tolerance
 	 * @return null if array are equal else indicative message
 	 */
 	static String testEquals(double[][] a, double[][] b, double eps) {
@@ -550,18 +1356,18 @@ public final class JumboTestUtils implements CMLConstants {
 		} else if (b == null) {
 			s = "b is null";
 		} else if (a.length != b.length) {
-			s = "unequal arrays: " + a.length + EC.S_SLASH + b.length;
+			s = "unequal arrays: " + a.length + CMLConstants.S_SLASH + b.length;
 		} else {
 			for (int i = 0; i < a.length; i++) {
 				if (a[i].length != b[i].length) {
 					s = "row (" + i + ") has unequal lengths: " + a[i].length
-							+ EC.S_SLASH + b[i].length;
+							+ CMLConstants.S_SLASH + b[i].length;
 					break;
 				}
 				for (int j = 0; j < a[i].length; j++) {
 					if (!Real.isEqual(a[i][j], b[i][j], eps)) {
 						s = "unequal element at (" + i + ", " + j + "), ("
-								+ a[i][j] + " != " + b[i][j] + EC.S_RBRAK;
+								+ a[i][j] + " != " + b[i][j] + CMLConstants.S_RBRAK;
 						break;
 					}
 				}
@@ -569,66 +1375,61 @@ public final class JumboTestUtils implements CMLConstants {
 		}
 		return s;
 	}
-	// Real2
+
 	/**
-	 * returns a message if arrays differ.
+	 * compare integer arrays.
 	 * 
-	 * @param a array to compare
-	 * @param b array to compare
-	 * @param eps tolerance
-	 * @return null if arrays are equal else indicative message
+	 * @param a
+	 * @param b
+	 * @return message or null
 	 */
-	public static String testEquals(Real2 a, Real2 b, double eps) {
+	public static String testEquals(int[] a, int[] b) {
 		String s = null;
 		if (a == null) {
 			s = "a is null";
 		} else if (b == null) {
 			s = "b is null";
+		} else if (a.length != b.length) {
+			s = "unequal arrays: " + a.length + CMLConstants.S_SLASH + b.length;
 		} else {
-			if (!Real.isEqual(a.x, b.x, eps) ||
-				!Real.isEqual(a.y, b.y, eps)) {
-				s = ""+a+" != "+b;
+			for (int i = 0; i < a.length; i++) {
+				if (a[i] != b[i]) {
+					s = "unequal element (" + i + "), " + a[i] + " != " + b[i];
+					break;
+				}
 			}
 		}
 		return s;
 	}
-// double arrays and related
-	
-	/**
-	 * equality test. true if both args not null and equal within epsilon
-	 * 
-	 * @param msg message
-	 * @param test
-	 * @param expected
-	 * @param epsilon
-	 */
-	public static void assertEquals(String msg, Transform2 expected, Transform2 test,
-			double epsilon) {
-		Assert.assertNotNull("test should not be null (" + msg + EC.S_RBRAK, test);
-		Assert.assertNotNull("expected should not be null (" + msg + EC.S_RBRAK,
-				expected);
-		JumboTestUtils.assertEquals(msg, expected
-				.getMatrixAsArray(), test.getMatrixAsArray(),  epsilon);
-	}
 
 	/**
-	 * equality test. true if both args not null and equal within epsilon
+	 * match arrays. error is a == null or b == null or a.length != b.length or
+	 * a[i] != b[i] nulls match
 	 * 
-	 * @param msg message
-	 * @param test 16 values
-	 * @param expected
-	 * @param epsilon
+	 * @param a
+	 * @param b
+	 * @return message if errors else null
 	 */
-	public static void assertEquals(String msg, double[] test,
-			Transform2 expected, double epsilon) {
-		Assert.assertNotNull("test should not be null (" + msg + EC.S_RBRAK, test);
-		Assert.assertEquals("test should have 16 elements (" + msg + EC.S_RBRAK,
-				9, test.length);
-		Assert.assertNotNull("ref should not be null (" + msg + EC.S_RBRAK,
-				expected);
-		JumboTestUtils.assertEquals(msg, test, expected.getMatrixAsArray(),
-				epsilon);
+	public static String testEquals(String[] a, String[] b) {
+		String s = null;
+		if (a == null) {
+			s = "a is null";
+		} else if (b == null) {
+			s = "b is null";
+		} else if (a.length != b.length) {
+			s = "unequal arrays: " + a.length + CMLConstants.S_SLASH + b.length;
+		} else {
+			for (int i = 0; i < a.length; i++) {
+				if (a[i] == null && b[i] == null) {
+					// both null, match
+				} else if (a[i] == null || b[i] == null || !a[i].equals(b[i])) {
+					s = "unequal element (" + i + "), expected: " + a[i]
+							+ " found: " + b[i];
+					break;
+				}
+			}
+		}
+		return s;
 	}
 
-	
 }
