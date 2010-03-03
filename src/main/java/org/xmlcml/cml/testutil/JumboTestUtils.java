@@ -1,9 +1,7 @@
 package org.xmlcml.cml.testutil;
 
 import java.io.File;
-
-
-
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
@@ -240,23 +238,29 @@ public final class JumboTestUtils implements CMLConstants {
 	private static void testStringDoubleEquality(String message,
 			String refValue, String testValue, double eps) {
 		Error ee = null;
-		try {
+		// maybe 
+		if (!testValue.equals(refValue)) {
+			double testVal = Double.NaN;
+			double refVal = Double.NaN;
 			try {
-				double testVal = new Double(testValue).doubleValue();
-				double refVal = new Double(refValue).doubleValue();
-				Assert
-						.assertEquals(message + " doubles ", refVal, testVal,
-								eps);
-			} catch (NumberFormatException e) {
-				Assert.assertEquals(message + " String ", refValue, testValue);
+				try {
+					testVal = new Double(testValue).doubleValue();
+					refVal = new Double(refValue).doubleValue();
+					Assert.assertEquals(message + " doubles ", refVal, testVal,
+									eps);
+				} catch (NumberFormatException e) {
+					Assert.assertEquals(message + " String ", refValue, testValue);
+				}
+			} catch (ComparisonFailure e) {
+				ee = e;
+			} catch (AssertionError e) {
+				ee = e;
 			}
-		} catch (ComparisonFailure e) {
-			ee = e;
-		} catch (AssertionError e) {
-			ee = e;
-		}
-		if (ee != null) {
-			throw new RuntimeException("" + ee);
+			if (ee != null) {
+				throw new RuntimeException(""+testValue+" != "+refValue ,ee);
+			}
+		} else {
+			Assert.assertEquals(message, refValue, testValue);
 		}
 	}
 
@@ -1259,6 +1263,21 @@ public final class JumboTestUtils implements CMLConstants {
 					.getRootElement();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		return root;
+	}
+
+	/**
+	 * convenience method to parse test file. 
+	 * @param filename relative to classpath
+	 * @return root element
+	 */
+	public static Element parseValidFile(File file) {
+		Element root = null;
+		try {
+			root = new CMLBuilder().build(new FileInputStream(file)).getRootElement();
+		} catch (Exception e) {
+			throw new RuntimeException("BUG ", e);
 		}
 		return root;
 	}
