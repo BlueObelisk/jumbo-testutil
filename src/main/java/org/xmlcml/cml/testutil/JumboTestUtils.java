@@ -947,7 +947,8 @@ public final class JumboTestUtils implements CMLConstants {
 	public static void assertEquals(String message, String[] a, String[] b) {
 		String s = testEquals(a, b);
 		if (s != null) {
-			Assert.fail(message + "; " + s);
+			Assert.fail(message + "; " + s + 
+					"("+Util.concatenate(a, "~")+" != "+Util.concatenate(b, "~"));
 		}
 	}
 
