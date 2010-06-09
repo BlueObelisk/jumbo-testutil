@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import junit.framework.AssertionFailedError;
@@ -26,6 +27,7 @@ import org.xmlcml.cml.base.CMLBuilder;
 import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.cml.base.CMLElement;
 import org.xmlcml.cml.base.CMLUtil;
+import org.xmlcml.cml.element.CMLMap;
 import org.xmlcml.euclid.EC;
 import org.xmlcml.euclid.EuclidRuntimeException;
 import org.xmlcml.euclid.IntArray;
@@ -1037,6 +1039,17 @@ public final class JumboTestUtils implements CMLConstants {
 			Element testNode, boolean stripWhite) {
 		assertEqualsCanonically(message, refNode, testNode, stripWhite, true);
 	}
+
+
+    public static void assertEqualsCanonically(String message, CMLMap refNode, CMLMap testNode) {
+		Assert.assertEquals("from refs", new HashSet<String>(refNode.getFromRefs()), new HashSet<String>(testNode.getFromRefs()));
+        Assert.assertEquals("to refs", new HashSet<String>(refNode.getToRefs()), new HashSet<String>(testNode.getToRefs()));
+        for (String fromRef : refNode.getFromRefs()) {
+            String toRef = refNode.getToRef(fromRef);
+            Assert.assertEquals("from/to refs", toRef, testNode.getToRef(fromRef));
+        }
+	}
+
 
 	/**
 	 * tests 2 XML objects for equality using canonical XML.
