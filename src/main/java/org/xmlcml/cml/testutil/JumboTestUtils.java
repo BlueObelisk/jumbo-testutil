@@ -128,8 +128,8 @@ public final class JumboTestUtils implements CMLConstants {
 					refNode.getClass());
 			if (refNode instanceof Text) {
 				testStringDoubleEquality(message + " on node: "
-						+ path(testNode), refNode.getValue(), testNode
-						.getValue(), eps);
+						+ path(testNode), refNode.getValue().trim(), testNode
+						.getValue().trim(), eps);
 			} else if (refNode instanceof Comment) {
 				Assert.assertEquals(message + " comment", refNode.getValue(),
 						testNode.getValue());
@@ -240,7 +240,10 @@ public final class JumboTestUtils implements CMLConstants {
 	private static void testStringDoubleEquality(String message,
 			String refValue, String testValue, double eps) {
 		Error ee = null;
+		testValue = testValue.trim();
+		refValue = refValue.trim();
 		// maybe 
+		
 		if (!testValue.equals(refValue)) {
 			double testVal = Double.NaN;
 			double refVal = Double.NaN;
@@ -259,7 +262,7 @@ public final class JumboTestUtils implements CMLConstants {
 				ee = e;
 			}
 			if (ee != null) {
-				throw new RuntimeException(""+testValue+" != "+refValue ,ee);
+				throw new RuntimeException("["+testValue+"] != ["+refValue+"]" ,ee);
 			}
 		} else {
 			Assert.assertEquals(message, refValue, testValue);
