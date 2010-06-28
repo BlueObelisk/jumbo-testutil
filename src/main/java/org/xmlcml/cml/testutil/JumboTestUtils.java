@@ -243,7 +243,9 @@ public final class JumboTestUtils implements CMLConstants {
 		testValue = testValue.trim();
 		refValue = refValue.trim();
 		// maybe 
-		
+		if (testValue.endsWith(" ") || refValue.endsWith(" ")) {
+			throw new RuntimeException("trim error");
+		}
 		if (!testValue.equals(refValue)) {
 			double testVal = Double.NaN;
 			double refVal = Double.NaN;
