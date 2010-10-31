@@ -1,6 +1,7 @@
 package org.xmlcml.cml.testutil;
 
 import java.io.File;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -239,7 +240,6 @@ public final class JumboTestUtils implements CMLConstants {
 
 	private static void testStringDoubleEquality(String message,
 			String refValue, String testValue, double eps) {
-		Error ee = null;
 		testValue = testValue.trim();
 		refValue = refValue.trim();
 		// maybe 
@@ -247,27 +247,58 @@ public final class JumboTestUtils implements CMLConstants {
 			throw new RuntimeException("trim error");
 		}
 		if (!testValue.equals(refValue)) {
-			double testVal = Double.NaN;
-			double refVal = Double.NaN;
 			try {
-				try {
-					testVal = new Double(testValue).doubleValue();
-					refVal = new Double(refValue).doubleValue();
-					Assert.assertEquals(message + " doubles ", refVal, testVal,
-									eps);
-				} catch (NumberFormatException e) {
-					Assert.assertEquals(message + " String ", refValue, testValue);
-				}
-			} catch (ComparisonFailure e) {
-				ee = e;
-			} catch (AssertionError e) {
-				ee = e;
-			}
-			if (ee != null) {
-				throw new RuntimeException("["+testValue+"] != ["+refValue+"]" ,ee);
+				compareAsFloats(message, refValue, testValue, eps);
+			} catch (Exception e) {
+				compareAsFloatArrays(message, refValue, testValue, eps);
 			}
 		} else {
 			Assert.assertEquals(message, refValue, testValue);
+		}
+	}
+
+	private static void compareAsFloats(String message, String refValue,
+			String testValue, double eps) {
+		double testVal = Double.NaN;
+		double refVal = Double.NaN;
+		Error ee = null;
+		try {
+			try {
+				testVal = new Double(testValue).doubleValue();
+				refVal = new Double(refValue).doubleValue();
+				Assert.assertEquals(message + " doubles ", refVal, testVal,
+								eps);
+			} catch (NumberFormatException e) {
+				Assert.assertEquals(message + " String ", refValue, testValue);
+			}
+		} catch (ComparisonFailure e) {
+			ee = e;
+		} catch (AssertionError e) {
+			ee = e;
+		}
+		if (ee != null) {
+			throw new RuntimeException("["+testValue+"] != ["+refValue+"]" ,ee);
+		}
+	}
+
+	private static void compareAsFloatArrays(String message, String refValue,
+			String testValue, double eps) {
+		Error ee = null;
+		try {
+			try {
+				RealArray testArray = new RealArray(testValue);
+				RealArray refArray = new RealArray(refValue);
+				assertEquals(message, testArray, refArray, eps);
+			} catch (NumberFormatException e) {
+				Assert.assertEquals(message + " String ", refValue, testValue);
+			}
+		} catch (ComparisonFailure e) {
+			ee = e;
+		} catch (AssertionError e) {
+			ee = e;
+		}
+		if (ee != null) {
+			throw new RuntimeException("["+testValue+"] != ["+refValue+"]" ,ee);
 		}
 	}
 
