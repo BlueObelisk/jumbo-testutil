@@ -1,7 +1,6 @@
 package org.xmlcml.cml.testutil;
 
 import java.io.File;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -23,6 +22,7 @@ import nu.xom.Text;
 import nu.xom.tests.XOMTestCase;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.xmlcml.cml.base.CMLBuilder;
 import org.xmlcml.cml.base.CMLConstants;
@@ -34,6 +34,7 @@ import org.xmlcml.euclid.EuclidRuntimeException;
 import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.IntMatrix;
 import org.xmlcml.euclid.IntSet;
+import org.xmlcml.euclid.JodaDate;
 import org.xmlcml.euclid.Line3;
 import org.xmlcml.euclid.Plane3;
 import org.xmlcml.euclid.Point3;
@@ -247,10 +248,28 @@ public final class JumboTestUtils implements CMLConstants {
 			throw new RuntimeException("trim error");
 		}
 		if (!testValue.equals(refValue)) {
+			boolean fail = true;
 			try {
 				compareAsFloats(message, refValue, testValue, eps);
+				fail = false;
 			} catch (Exception e) {
-				compareAsFloatArrays(message, refValue, testValue, eps);
+			}
+			if (fail) {
+				try {
+					compareAsFloatArrays(message, refValue, testValue, eps);
+					fail = false;
+				} catch (Exception e) {
+				}
+			}
+			if (fail) {
+				try {
+					compareAsDates(message, refValue, testValue, eps);
+					fail = false;
+				} catch (Exception e) {
+				}
+			}
+			if (fail) {
+				Assert.fail("Cannot equate: "+refValue+" != "+testValue);
 			}
 		} else {
 			Assert.assertEquals(message, refValue, testValue);
@@ -279,6 +298,16 @@ public final class JumboTestUtils implements CMLConstants {
 		if (ee != null) {
 			throw new RuntimeException("["+testValue+"] != ["+refValue+"]" ,ee);
 		}
+	}
+
+	private static void compareAsDates(String message, String refValue,
+			String testValue, double eps) {
+		DateTime testVal = null;
+		DateTime refVal = null;
+		testVal = JodaDate.parseDate(testValue);
+		refVal = JodaDate.parseDate(refValue);
+		Assert.assertEquals(message + " date ", refVal, testVal);
+
 	}
 
 	private static void compareAsFloatArrays(String message, String refValue,
