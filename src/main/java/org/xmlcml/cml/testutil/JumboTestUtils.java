@@ -1118,6 +1118,23 @@ public final class JumboTestUtils implements CMLConstants {
 	}
 
 
+	/**
+	 * tests 2 XML objects for equality using canonical XML.
+	 * 
+	 * @param message
+	 * @param refNode
+	 *            first node
+	 * @param testNode
+	 *            second node
+	 * @param stripWhite
+	 *            if true remove w/s nodes
+	 */
+	public static void assertEqualsCanonically(String message, String refXMLString,
+			Element testNode, boolean stripWhite) {
+		assertEqualsCanonically(message, JumboTestUtils.parseValidString(refXMLString), testNode, stripWhite, true);
+	}
+
+
     public static void assertEqualsCanonically(String message, CMLMap refNode, CMLMap testNode) {
 		Assert.assertEquals("from refs", new HashSet<String>(refNode.getFromRefs()), new HashSet<String>(testNode.getFromRefs()));
         Assert.assertEquals("to refs", new HashSet<String>(refNode.getToRefs()), new HashSet<String>(testNode.getToRefs()));
