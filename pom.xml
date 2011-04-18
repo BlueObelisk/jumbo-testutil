@@ -1,44 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-   <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-   <parent>
-      <groupId>wwmm</groupId>
-      <artifactId>wwmm-parent</artifactId>
-      <version>2-SNAPSHOT</version>
-   </parent>
+	<parent>
+		<groupId>wwmm</groupId>
+		<artifactId>wwmm-parent</artifactId>
+		<version>2-SNAPSHOT</version>
+	</parent>
 
-   <groupId>cml</groupId>
-   <artifactId>jumbo-testutil</artifactId>
-   <version>1.0-SNAPSHOT</version>
-   <name>jumbo-testutil</name>
-   <dependencies>
-      <dependency>
-         <groupId>junit</groupId>
-         <artifactId>junit</artifactId>
-         <version>4.0</version>
-      </dependency>
+	<groupId>cml</groupId>
+	<artifactId>jumbo-testutil</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<name>jumbo-testutil</name>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.0</version>
+		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.13</version>
 		</dependency>
-      <dependency>
-         <groupId>cml</groupId>
-         <artifactId>cmlxom</artifactId>
-	<version>2.5.1-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-         <groupId>xom</groupId>
-         <artifactId>xom</artifactId>
+		<dependency>
+			<groupId>cml</groupId>
+			<artifactId>cmlxom</artifactId>
+			<version>2.5.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>xom</groupId>
+			<artifactId>xom</artifactId>
 			<version>1.1</version>
-      </dependency>
-   </dependencies>
-   <repositories>
-	<repository>
-		<id>ucc-repo</id>
-		<url>https://maven.ch.cam.ac.uk/m2repo</url>
-	</repository>
-   </repositories>
+		</dependency>
+	</dependencies>
+	<repositories>
+		<repository>
+			<id>ucc-repo</id>
+			<url>https://maven.ch.cam.ac.uk/m2repo</url>
+		</repository>
+	</repositories>
 </project>
