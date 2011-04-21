@@ -11,7 +11,7 @@
 
 	<groupId>cml</groupId>
 	<artifactId>jumbo-testutil</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>jumbo-testutil</name>
 	<dependencies>
 		<dependency>
