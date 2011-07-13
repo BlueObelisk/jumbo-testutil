@@ -12,7 +12,46 @@
 	<groupId>cml</groupId>
 	<artifactId>jumbo-testutil</artifactId>
 	<version>1.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>jumbo-testutil</name>
+	<description>Test utilities for the JUMBO library</description>
+	<url>http://bitbucket.org/wwmm/jumbo-testutil</url>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<url>https://bitbucket.org/wwmm/jumbo-testutil/src</url>
+		<connection>scm:hg:http://bitbucket.org/wwmm/jumbo-testutil</connection>
+		<developerConnection>scm:hg:https://bitbucket.org/wwmm/jumbo-testutil</developerConnection>
+	</scm>
+
+	<developers>
+		<developer>
+			<id>dmj30</id>
+			<name>David Jessop</name>
+		</developer>
+		<developer>
+			<id>ojd20</id>
+			<name>Jim Downing</name>
+		</developer>
+		<developer>
+			<id>nwe23</id>
+			<name>Nick England</name>
+		</developer>
+		<developer>
+			<id>pm286</id>
+			<name>Peter Murray-Rust</name>
+		</developer>
+		<developer>
+			<id>sea36</id>
+			<name>Sam Adams</name>
+		</developer>
+	</developers>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.xml-cml</groupId>
