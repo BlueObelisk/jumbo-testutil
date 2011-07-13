@@ -85,10 +85,24 @@
 			<version>1.6.2</version>
 		</dependency>
 	</dependencies>
+
+	<!-- remove <repositories> for releases to maven central -->
 	<repositories>
 		<repository>
 			<id>ucc-repo</id>
 			<url>https://maven.ch.cam.ac.uk/m2repo</url>
 		</repository>
 	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<configuration>
+					<header>src/main/resources/header.txt</header>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
