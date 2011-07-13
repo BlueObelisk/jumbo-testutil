@@ -4,9 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>wwmm</groupId>
+		<groupId>uk.ac.cam.ch.wwmm</groupId>
 		<artifactId>wwmm-parent</artifactId>
-		<version>2-SNAPSHOT</version>
+		<version>4</version>
 	</parent>
 
 	<groupId>cml</groupId>
@@ -15,24 +15,35 @@
 	<name>jumbo-testutil</name>
 	<dependencies>
 		<dependency>
+			<groupId>org.xml-cml</groupId>
+			<artifactId>cmlxom</artifactId>
+			<version>3.2-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.xml-cml</groupId>
+			<artifactId>euclid</artifactId>
+			<version>1.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.0</version>
+			<version>4.8.2</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-			<version>1.2.13</version>
-		</dependency>
-		<dependency>
-			<groupId>cml</groupId>
-			<artifactId>cmlxom</artifactId>
-			<version>3.1-SNAPSHOT</version>
+			<version>1.2.16</version>
 		</dependency>
 		<dependency>
 			<groupId>xom</groupId>
 			<artifactId>xom</artifactId>
-			<version>1.1</version>
+			<version>1.2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>1.6.2</version>
 		</dependency>
 	</dependencies>
 	<repositories>
