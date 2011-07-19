@@ -1,44 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-   <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-   <parent>
-      <groupId>wwmm</groupId>
-      <artifactId>wwmm-parent</artifactId>
-      <version>2-SNAPSHOT</version>
-   </parent>
+	<parent>
+		<groupId>uk.ac.cam.ch.wwmm</groupId>
+		<artifactId>wwmm-parent</artifactId>
+		<version>4</version>
+	</parent>
 
-   <groupId>cml</groupId>
-   <artifactId>jumbo-testutil</artifactId>
-   <version>1.0-SNAPSHOT</version>
-   <name>jumbo-testutil</name>
-   <dependencies>
-      <dependency>
-         <groupId>junit</groupId>
-         <artifactId>junit</artifactId>
-         <version>4.0</version>
-      </dependency>
+	<groupId>org.xml-cml</groupId>
+	<artifactId>jumbo-testutil</artifactId>
+	<version>1.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>jumbo-testutil</name>
+	<description>Test utilities for the JUMBO library</description>
+	<url>http://bitbucket.org/wwmm/jumbo-testutil</url>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<url>https://bitbucket.org/wwmm/jumbo-testutil/src</url>
+		<connection>scm:hg:http://bitbucket.org/wwmm/jumbo-testutil</connection>
+		<developerConnection>scm:hg:https://bitbucket.org/wwmm/jumbo-testutil</developerConnection>
+	</scm>
+
+	<developers>
+		<developer>
+			<id>dmj30</id>
+			<name>David Jessop</name>
+		</developer>
+		<developer>
+			<id>ojd20</id>
+			<name>Jim Downing</name>
+		</developer>
+		<developer>
+			<id>nwe23</id>
+			<name>Nick England</name>
+		</developer>
+		<developer>
+			<id>pm286</id>
+			<name>Peter Murray-Rust</name>
+		</developer>
+		<developer>
+			<id>sea36</id>
+			<name>Sam Adams</name>
+		</developer>
+	</developers>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.xml-cml</groupId>
+			<artifactId>cmlxom</artifactId>
+			<version>3.2-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.xml-cml</groupId>
+			<artifactId>euclid</artifactId>
+			<version>1.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-			<version>1.2.13</version>
+			<version>1.2.16</version>
 		</dependency>
-      <dependency>
-         <groupId>cml</groupId>
-         <artifactId>cmlxom</artifactId>
+		<dependency>
 	<version>3.1-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-         <groupId>xom</groupId>
-         <artifactId>xom</artifactId>
-			<version>1.1</version>
-      </dependency>
-   </dependencies>
-   <repositories>
-	<repository>
-		<id>ucc-repo</id>
-		<url>https://maven.ch.cam.ac.uk/m2repo</url>
-	</repository>
-   </repositories>
+			<groupId>xom</groupId>
+			<artifactId>xom</artifactId>
+			<version>1.2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+	</dependencies>
+
+	<!-- remove <repositories> for releases to maven central -->
+	<repositories>
+		<repository>
+			<id>ucc-repo</id>
+			<url>https://maven.ch.cam.ac.uk/m2repo</url>
+		</repository>
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<configuration>
+					<header>src/main/resources/header.txt</header>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
