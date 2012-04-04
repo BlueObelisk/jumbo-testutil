@@ -1441,7 +1441,8 @@ public final class JumboTestUtils implements CMLConstants {
 			System.err.println("==========XMLDIFF reference=========");
 			CMLUtil.debug((Element) refNode, System.err, 2);
 			System.err.println("------------test---------------------");
-			CMLUtil.debug((Element) testNode, System.err, 2);
+			String s = testNode.toXML().replace("><", ">\n<");
+			System.err.println(s);
 			System.err.println("==============" + message
 					+ "===================");
 		} catch (Exception e) {
