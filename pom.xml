@@ -100,6 +100,7 @@
 			<plugin>
 				<groupId>com.mycila.maven-license-plugin</groupId>
 				<artifactId>maven-license-plugin</artifactId>
+                                <version>1.10.b1</version>
 				<configuration>
 					<header>src/main/resources/header.txt</header>
 				</configuration>
