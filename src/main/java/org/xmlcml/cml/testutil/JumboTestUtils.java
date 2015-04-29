@@ -17,7 +17,6 @@
 package org.xmlcml.cml.testutil;
 
 import java.io.File;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -46,6 +45,7 @@ import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.cml.base.CMLElement;
 import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.cml.element.CMLMap;
+import org.xmlcml.cml.testutils.CMLXOMTestUtils;
 import org.xmlcml.euclid.EC;
 import org.xmlcml.euclid.EuclidRuntimeException;
 import org.xmlcml.euclid.IntArray;
@@ -1148,7 +1148,7 @@ public final class JumboTestUtils implements CMLConstants {
 	 */
 	public static void assertEqualsCanonically(String message, String refXMLString,
 			Element testNode, boolean stripWhite) {
-		assertEqualsCanonically(message, JumboTestUtils.parseValidString(refXMLString), testNode, stripWhite, true);
+		assertEqualsCanonically(message, CMLXOMTestUtils.parseValidString(refXMLString), testNode, stripWhite, true);
 	}
 
 
@@ -1199,7 +1199,7 @@ public final class JumboTestUtils implements CMLConstants {
 
 	/**
 	 * compares two XML nodes and checks float near-equivalence (can also be
-	 * used for documents without floats) uses JumboTestUtils.assertEqualsCanonically and only
+	 * used for documents without floats) uses CMLXOMTestUtils.assertEqualsCanonically and only
 	 * uses PMR code if fails
 	 * 
 	 * @param message

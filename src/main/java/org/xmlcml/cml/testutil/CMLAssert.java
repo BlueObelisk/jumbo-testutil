@@ -39,6 +39,7 @@ import org.xmlcml.cml.element.CMLPlane3;
 import org.xmlcml.cml.element.CMLPoint3;
 import org.xmlcml.cml.element.CMLTransform3;
 import org.xmlcml.cml.element.CMLVector3;
+import org.xmlcml.cml.testutils.CMLXOMTestUtils;
 import org.xmlcml.euclid.Point3;
 import org.xmlcml.euclid.Vector3;
 
@@ -239,7 +240,7 @@ public class CMLAssert {
 		String molS = mol.getCanonicalString();
 		String mol1S = mol1.getCanonicalString();
 		Assert.assertEquals("MOLECUL equality: ", molS, mol1S);
-		JumboTestUtils.assertEqualsCanonically("molecule equality", mol, mol1);
+		CMLXOMTestUtils.assertEqualsCanonically("molecule equality", mol, mol1);
 	}
 
 	/**
